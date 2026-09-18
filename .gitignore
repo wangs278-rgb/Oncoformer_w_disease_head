@@ -49,3 +49,6 @@ __pycache__/
 # --- OS / editor cruft ---
 .DS_Store
 *.swp
+*.bak
+*.bak.*
+*.orig

@@ -138,6 +138,11 @@ pip install -e Oncoformer_moco    # provides `oncoformer.models.OncoformerPost`
 `run8_disease_config.use_moco_oncoformer()` forces `import oncoformer` to resolve to the
 `Oncoformer_moco` package; the training/eval scripts assert this at startup.
 
+> **⚠️ Paths are hardcoded.** The scripts assume the data directory
+> `DATA_DIR = /cv/home/wangs278/scratch/fmi` (and matching `OUT_DIR = .../run8_disease_out`).
+> Before running on another machine, point these at your own data location — e.g. find them
+> with `grep -rl /cv/home/wangs278 *.py` and edit `DATA_DIR` / `OUT_DIR` at the top of each.
+
 ---
 
 ## Data & artifacts (not in git)
