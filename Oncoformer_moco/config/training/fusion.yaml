@@ -1,0 +1,82 @@
+seed: 42
+optimizer: AdamW
+learning_rate: 5e-5
+weight_decay: 1e-4
+scheduler_curve: cosine
+num_epochs: 60
+train_test_split: 0.8
+train_test_by_sample_metadata: false
+scheduler_warmup_fraction: 0.1
+batch_size: 512
+
+pre_train_model: true
+fine_tune_model: false
+fine_tune_model_learning_rate: 0.000001
+
+# CLIP-MoCo Cross-Modal Contrastive
+# Note: CLIP always uses unimodal encoding (no cross-stitch) to prevent information leakage
+clip_queue_size: 65536
+clip_out_dim: 64  # low-rank projection forces discovery of principal biological factors
+clip_hidden_dim: 256
+clip_temperature: 0.07
+clip_head_lr_mult: 1.0
+clip_head_decay: 5e-4
+clip_teacher_m_base: 0.996
+clip_teacher_m_final: 0.9995
+
+# Contrastive token crops per modality
+dna_contrast_mask_rate: 0.2
+rna_contrast_mask_rate: 0.25
+
+# Fusion moddrop
+moddrop_student_p: 0.15
+moddrop_teacher_p: 0.0
+context_moddrop_p: 0.25
+
+# DNA masking
+dna_shuffle_prob: 0.1
+dna_mask_modes:
+  - alterations
+  - components
+  - positions
+dna_mask_weights:
+  - 1.0
+  - 0.25
+  - 0.10
+dna_masking_rate: 0.2
+dna_contrast_aug_warm_epochs: 3
+dna_contrast_vaf_noise_hi: 0.004
+dna_contrast_vaf_noise_lo: 0.003
+dna_contrast_vaf_a_lo: 0.97
+dna_contrast_vaf_a_hi: 1.03
+dna_contrast_vaf_b_abs: 0.01
+dna_contrast_vaf_q_step: 0.0
+
+# RNA masking
+rna_shuffle_prob: 0.0
+rna_mask_modes:
+  - alterations
+  - components
+  - positions
+rna_mask_weights:
+  - 1.0
+  - 1.0
+  - 1.0
+rna_masking_rate: 0.33
+
+# Loss weights
+clip_meta_w: 1.0
+recon_meta_w: 1.0
+dna_contrast_meta_weight: 0.1
+rna_contrast_meta_weight: 0.1
+
+visualization:
+  save_self_attn: false
+
+wandb:
+  enabled: true
+  project: oncoformer
+  entity: null
+  name: null
+  log_model: false
+  tags: ["fusion", "caris"]

@@ -1,0 +1,4 @@
+defaults:
+    - architecture: empty
+    - data: caris
+    - vocab: caris_cmdb

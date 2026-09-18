@@ -1,0 +1,4 @@
+defaults:
+    - architecture: mlm_4_layer_fmi
+    - data: fmi
+    - vocab: fmi

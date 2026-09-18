@@ -1,0 +1,16 @@
+modalities: ['dna', 'rna']
+embed_dim: 512
+num_heads: 8
+hidden_dim: 512
+num_layers: 4
+pad_idx: 0
+dropout: 0.3
+pool_embeddings: cls_token   # or mean | cls_attn
+stitch:
+  enabled: true
+  pattern: cls2all          # or cls2cls | all2all
+  nhead: 8
+  dropout: 0.3
+  ff_ratio: 4.0
+  gate_init: -2.0
+  topk: null                # e.g., 32 if all2all

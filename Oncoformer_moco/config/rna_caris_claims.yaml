@@ -1,0 +1,13 @@
+defaults:
+    - omics: rna
+    - metadata: caris_claims
+    - training: fusion
+
+anndata: ./datasets/caris/rna_claims.h5ad
+sample_metadata_path: ./datasets/sample_metadata.pkl
+data_file_prefix: rna_caris_claims_
+
+sample_index:
+    join: intersection
+    id_column: { rna: index }
+

@@ -1,0 +1,4 @@
+defaults:
+    - architecture: hyper_model
+    - data: depmap
+    - vocab: depmap

@@ -1,0 +1,8 @@
+defaults:
+    - omics: omics_fusion
+    - metadata: depmap
+    - training: posttraining
+anndata: ./datasets/posttraining_data.h5
+mode: paired
+sample_metadata_path: ./datasets/sample_metadata.pkl
+data_file_prefix: posttraining_

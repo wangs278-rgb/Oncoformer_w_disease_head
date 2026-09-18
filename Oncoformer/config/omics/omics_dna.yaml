@@ -1,0 +1,3 @@
+defaults:
+    - architecture: omics_dna
+    - modalities: omics_mlm_dna

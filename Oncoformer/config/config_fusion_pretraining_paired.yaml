@@ -1,0 +1,12 @@
+defaults:
+    - omics: omics_fusion
+    - metadata: empty
+    - training: pretraining_fusion
+anndata: ./datasets/pretraining_data_paired.h5
+sample_metadata_path: ./datasets/sample_metadata.pkl
+data_file_prefix: pretraining_paired_
+
+sample_index:
+    join: intersection
+    id_column: { dna: SampleID, rna: index }
+

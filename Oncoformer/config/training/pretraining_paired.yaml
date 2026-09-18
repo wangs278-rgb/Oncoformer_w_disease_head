@@ -1,0 +1,33 @@
+seed: 42
+train_test_split: 0.8
+train_test_by_sample_metadata: false
+train_sample_metadata_variable: source
+train_sample_metadata_values:
+    - TCGA
+test_sample_metadata_values:
+    - CIT
+batch_size: 64
+optimizer: AdamW
+scheduler_curve: cosine
+learning_rate: 0.0001
+num_epochs: 200
+scheduler_warmup_fraction: 0.1
+dna_shuffle_prob: 0.25
+dna_masking_rate_start: 0.25
+dna_masking_rate_steady: 0.25
+dna_masking_rate_decay_epochs: 10
+dna_set_loss_param: 1.0
+dna_row_loss_param: 0.25
+dna_ind_loss_param: 0.05
+rna_mask_ratio: 0.25
+rna_dab_weight: 75
+rna_ecs_weight: 10
+
+byol:
+  enabled: false
+  weight: 0.2
+  predictor_hidden: 1024
+  use_batchnorm: true
+
+visualization:
+  save_self_attn: false

@@ -1,0 +1,14 @@
+point_estimate:
+    hallmark: 
+        meta_weight: 1.0
+    c2_cgp: 
+        meta_weight: 1.0
+    c2_cp: 
+        meta_weight: 1.0
+    c6: 
+        meta_weight: 1.0
+discrete:
+    indication: { meta_weight: 1.0, ignore_patterns:['nos'] }
+    subtype: { meta_weight: 1.0, ignore_patterns:['NOS'] }
+    biopsy_site: { meta_weight: 1.0, ignore_patterns:['NOS'] }
+data_path: ./datasets/metadata_caris.pt

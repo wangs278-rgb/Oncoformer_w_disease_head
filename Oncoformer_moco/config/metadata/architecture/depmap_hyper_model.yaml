@@ -1,0 +1,5 @@
+confounder_dim: 13
+entity_embedding_dim: 256
+num_basis_functions: 16
+hidden_dim: 256
+dropout_rate: 0.15

@@ -1,0 +1,50 @@
+# ---------------------------------------------------------------------------
+# fmi repo — CODE ONLY. All large data / model / tokenized / output artifacts
+# are excluded (they total ~460 GB and exceed GitHub's 100 MB/file limit).
+# Regenerate data with the build_*/pretokenize_* scripts; models via train_*.
+# ---------------------------------------------------------------------------
+
+# --- Model & tensor binaries ---
+*.pt
+*.pth
+*.ckpt
+*.ckpt.corrupt*
+*.corrupt.*
+*.h5
+*.hdf5
+*.pkl
+*.npy
+*.npz
+*.feather
+*.arrow
+*.parquet
+*.safetensors
+*.bin
+
+# --- ESM embedding artifacts (incl. the 37 MB vocab json) ---
+esm_unpaired_*
+
+# --- Tabular / annotation data ---
+*.csv
+*.tsv
+external_annotations/
+
+# --- Training / analysis output directories ---
+run*_out/
+
+# --- SLURM logs & job-id state ---
+*.out
+*.err
+*.jobids
+.*_jobids
+nohup.out
+
+# --- Python caches ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.ipynb_checkpoints/
+
+# --- OS / editor cruft ---
+.DS_Store
+*.swp

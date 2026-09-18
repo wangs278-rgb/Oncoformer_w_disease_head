@@ -1,0 +1,10 @@
+anndata_uns_key: unpaired
+anndata_uns_patient_metadata_cols:
+    - BaitSet
+    - DiseaseTerm
+    - DiseaseGroup
+tokenizer_save_path: ./datasets/tokenizer_dna_uns_unpaired.pkl
+tokenized_data_path: ./datasets/tokenized_dna_uns_unpaired.pt
+raw_data_path: ./datasets/raw_dna_uns_unpaired.pt
+rank_by_component: gene
+rank_direction: asc

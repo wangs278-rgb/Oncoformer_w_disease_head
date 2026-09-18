@@ -1,0 +1,40 @@
+defaults:
+    - architecture: rna_omics_genept
+    - data: paired
+
+# Run-specific HVG vocab (built on first tokenization and reused)
+vocab:
+  file: ./datasets/rna_hvg_vocab.json
+
+# Data preprocessing knobs
+data:
+  kind: bulkrna          # bulkrna | scrna
+  batch_key: null        # optional batch column for HVG
+  rank_by_component: expression
+  rank_direction: desc
+
+  # scrna normalization / transform
+  scrna_normalization:
+    target_sum: 10000
+  scrna_transform:
+    method: log1p        # log1p | sctransform (later)
+
+  # bulkrna normalization / transform
+  bulk_normalization:
+    method: median_of_ratios  # DESeq2 size factors
+  bulk_transform:
+    method: vst               # variance-stabilizing transform
+
+  # Post-hoc per-gene quantile mapping
+  posthoc:
+    clip_quantiles: [0.001, 0.999]
+    quantile_fit_scope: all   # all | train
+
+  # Discretization for expression_bin
+  discretization:
+    n_bins: 32
+    zero_bin: true
+
+  # Stats artifact written by tokenizer
+  stats_path: ./datasets/rna_stats.json
+

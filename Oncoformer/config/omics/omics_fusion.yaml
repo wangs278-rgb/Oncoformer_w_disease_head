@@ -1,0 +1,4 @@
+defaults:
+    - architecture: omics_fusion
+    - modalities: omics_fusion_paired
+

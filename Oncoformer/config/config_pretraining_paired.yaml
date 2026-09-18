@@ -1,0 +1,8 @@
+defaults:
+    - omics: omics_fusion
+    - metadata: empty
+    - training: pretraining_paired
+anndata: ./datasets/pretraining_data_paired.h5
+mode: paired
+sample_metadata_path: ./datasets/sample_metadata.pkl
+data_file_prefix: pretraining_paired_

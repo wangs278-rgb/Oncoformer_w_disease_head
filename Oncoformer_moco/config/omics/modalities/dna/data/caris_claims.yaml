@@ -1,0 +1,10 @@
+source: parquet
+parquet_paths:
+    - ./datasets/caris/nsclc_claims_dragen_somatic_filtered_and_cnv.parquet
+    - ./datasets/caris/bc_claims_dragen_somatic_filtered_and_cnv.parquet
+    - ./datasets/caris/crc_claims_dragen_somatic_filtered_and_cnv.parquet
+tokenizer_save_path: ./datasets/tokenizer_dna.pkl
+tokenized_data_path: ./datasets/tokenized_dna.pt
+raw_data_path: ./datasets/raw_dna.pt
+rank_by_component: gene
+rank_direction: asc

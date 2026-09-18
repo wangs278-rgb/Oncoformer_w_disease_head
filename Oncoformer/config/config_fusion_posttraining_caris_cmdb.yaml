@@ -1,0 +1,15 @@
+defaults:
+    - omics: omics_fusion
+    - metadata: caris_cmdb
+    - training: pretraining_fusion
+    - override /omics/modalities/dna/architecture: omics_mlm_4_layer_caris
+    - override /omics/modalities/dna/data: caris_cmdb
+    - override /omics/modalities/rna/data: caris
+anndata: ./datasets/caris/rna_cmdb.h5ad
+sample_metadata_path: ./datasets/sample_metadata.pkl
+data_file_prefix: posttraining_caris_cmdb_
+
+sample_index:
+    join: intersection
+    id_column: { dna: SampleID, rna: index }
+

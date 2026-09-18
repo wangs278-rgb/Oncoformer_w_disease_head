@@ -1,0 +1,54 @@
+defaults:
+    - architecture: rna_genept
+    - data: rna
+
+vocab:
+  file: ./datasets/rna_hvg_vocab.json
+
+architecture:
+  graph:
+    enabled: true
+    use_edge_weights: true
+    beta: 0.5
+    cheby_K: 6
+    preserve_cls: true
+    mode: union
+    min_shared: 1
+    proj_weight: sum
+    proj_topk_per_node: 32
+    proj_lambda: 0.5
+    # When regulators are disabled we coalesce duplicate edges per sample (weights sum).
+    add_regulators: false
+    max_regulators_per_sample: 64
+
+data:
+  kind: bulkrna
+  batch_key: null
+  rank_by_component: gene
+  rank_direction: asc
+
+  scrna_normalization:
+    target_sum: 10000
+  scrna_transform:
+    method: log1p
+
+  bulk_normalization:
+    method: median_of_ratios
+  bulk_transform:
+    method: vst
+
+  posthoc:
+    clip_quantiles: [0.001, 0.999]
+    quantile_fit_scope: all
+
+  discretization:
+    n_bins: 32
+    zero_bin: true
+
+  stats_path: ./datasets/rna_stats.json
+
+  graph:
+    grn_path: ./datasets/dorothea.csv
+    make_undirected: true
+    sep: ","
+    canonicalize: upper

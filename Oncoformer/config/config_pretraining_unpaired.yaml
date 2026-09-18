@@ -1,0 +1,7 @@
+defaults:
+    - omics: omics_dna
+    - metadata: empty
+    - training: pretraining_omics
+anndata: ./datasets/pretraining_data_paired.h5
+sample_metadata_path: ./datasets/sample_metadata.pkl
+data_file_prefix: pretraining_unpaired_

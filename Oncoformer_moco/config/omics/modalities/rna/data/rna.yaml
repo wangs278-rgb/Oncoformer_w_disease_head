@@ -1,0 +1,4 @@
+batch_key: null
+tokenized_data_path: ./datasets/tokenized_rna.pt
+raw_data_path: ./datasets/raw_rna.pt
+graph_data_path: ./datasets/graphs_rna.pt

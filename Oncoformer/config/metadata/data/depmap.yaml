@@ -1,0 +1,11 @@
+point_estimate:
+    chronos: 
+        meta_weight: 1.0
+    demeter: 
+        meta_weight: 1.0
+series:
+    genetic: 
+        meta_weight: 1.0
+dose_space: linear
+confounder: confounder
+data_path: ./datasets/metadata_depmap.pt

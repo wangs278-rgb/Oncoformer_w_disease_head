@@ -1,0 +1,4 @@
+defaults:
+    - dna: genomic_mlm_paired
+    - rna: omics_rna_paired
+

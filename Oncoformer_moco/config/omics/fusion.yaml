@@ -1,0 +1,3 @@
+defaults:
+    - architecture: fusion
+    - modalities: fusion

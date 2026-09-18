@@ -1,0 +1,4 @@
+defaults:
+    - architecture: omics_mlm_4_layer_sum
+    - data: paired
+    - vocab: fmi_default

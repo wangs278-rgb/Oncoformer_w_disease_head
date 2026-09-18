@@ -1,0 +1,102 @@
+max_length: 128
+component_configs:
+  gene:
+    encoder_type: LayerNormEncoder
+    encode: false
+    predict: true
+    params:
+      num_embeddings: true
+      embedding_dim: 512
+      padding_idx: 0
+    combination: concat
+  alt_type:
+    encoder_type: LayerNormEncoder
+    encode: false
+    predict: true
+    params:
+      num_embeddings: true
+      embedding_dim: 512
+      padding_idx: 0
+    combination: concat
+    loss_param: 0.1
+  pathogenicity:
+    encoder_type: LayerNormEncoder
+    encode: false
+    predict: true
+    params:
+      num_embeddings: true
+      embedding_dim: 512
+      padding_idx: 0
+    combination: concat
+    loss_param: 0.2
+  zygosity:
+    encoder_type: LayerNormEncoder
+    encode: false
+    predict: true
+    params:
+      num_embeddings: true
+      embedding_dim: 512
+      padding_idx: 0
+    combination: concat
+    loss_param: 0.2
+  aa_ref:
+    encoder_type: LayerNormEncoder
+    encode: false
+    predict: true
+    params:
+      num_embeddings: true
+      embedding_dim: 256
+      padding_idx: 0
+    combination: concat
+    loss_param: 0.1
+  aa_mut:
+    encoder_type: LayerNormEncoder
+    encode: false
+    predict: true
+    params:
+      num_embeddings: true
+      embedding_dim: 256
+      padding_idx: 0
+    combination: concat
+    loss_param: 0.1
+  protein:
+    encoder_type: PrecomputedEmbeddingsEncoder
+    encode: true
+    predict: gene
+    params:
+      weight_path: ./datasets/esm_unpaired_layer_33_diff_embedding_full.protein.weight.pt
+      vocab_path: ./datasets/esm_unpaired_layer_33_diff_embedding_full.protein.vocab.json
+      trainable: false
+    combination: concat
+  mutation:
+    encoder_type: PrecomputedEmbeddingsAtomicEncoder
+    encode: true
+    predict: [alt_type, aa_ref, aa_mut, pathogenicity]
+    params:
+      weight_path: ./datasets/esm_unpaired_layer_33_diff_embedding_full.mutation.weight.pt
+      vocab_path: ./datasets/esm_unpaired_layer_33_diff_embedding_full.mutation.vocab.json
+      dtype: bf16
+      trainable_base: false
+      trainable_atomic: true
+    combination: concat
+  aa_vaf:
+    encoder_type: FourierFractionEncoder
+    encode: true
+    predict: aa_vaf_bin
+    params:
+      embedding_dim: 512
+      fourier_dim: 32
+      f_min: 1.0
+      f_max: 64.0
+      add_logit: true
+    combination: sum
+    loss_param: 0.33
+  aa_vaf_bin:
+    encoder_type: LayerNormEncoder
+    encode: false
+    predict: true
+    params:
+      num_embeddings: true
+      embedding_dim: 128
+      padding_idx: 0
+    combination: concat

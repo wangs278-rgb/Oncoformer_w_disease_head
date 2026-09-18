@@ -1,0 +1,7 @@
+defaults:
+    - omics: omics_dna
+    - metadata: fmi
+    - training: pretraining_omics
+anndata: ./datasets/posttraining_data_unpaired.h5
+sample_metadata_path: ./datasets/sample_metadata.pkl
+data_file_prefix: posttraining_unpaired_

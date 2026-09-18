@@ -1,0 +1,77 @@
+seed: 42
+optimizer: AdamW
+learning_rate: 5e-5
+weight_decay: 1e-4
+scheduler_curve: cosine
+num_epochs: 40
+train_test_split: 0.8
+train_test_by_sample_metadata: false
+scheduler_warmup_fraction: 0.1
+batch_size: 512
+
+pre_train_model: true
+fine_tune_model: false
+fine_tune_model_learning_rate: 0.000001
+
+# CLIP-MoCo Cross-Modal Contrastive
+clip_queue_size: 65536
+clip_out_dim: 256
+clip_hidden_dim: 2048
+clip_temperature: 0.07
+clip_head_lr_mult: 3.0
+clip_head_decay: 5e-4
+clip_teacher_m_base: 0.996
+clip_teacher_m_final: 0.9995
+
+# Contrastive token crops per modality
+dna_contrast_mask_rate: 0.25
+rna_contrast_mask_rate: 0.33
+moddrop_student_p: 0.0
+moddrop_teacher_p: 0.0
+
+# Masking (names are modality‑prefixed)
+context_moddrop_p: 0.0
+
+dna_shuffle_prob: 0.25
+dna_mask_modes:
+  - alterations
+  - components
+  - positions
+dna_mask_weights:
+  - 1.0
+  - 0.25
+  - 0.10
+dna_masking_rate: 0.2
+dna_contrast_aug_warm_epochs: 3
+dna_contrast_vaf_noise_hi: 0.004
+dna_contrast_vaf_noise_lo: 0.003
+dna_contrast_vaf_a_lo: 0.97
+dna_contrast_vaf_a_hi: 1.03
+dna_contrast_vaf_b_abs: 0.01
+dna_contrast_vaf_q_step: 0.0
+
+rna_shuffle_prob: 0.0
+rna_masking_rate_start: 0.20
+rna_masking_rate_steady: 0.20
+rna_masking_rate_decay_epochs: 20
+rna_set_loss_param: 1.0
+rna_row_loss_param: 0.0
+rna_ind_loss_param: 0.0
+
+
+# Loss weights
+clip_meta_w: 0.75
+recon_meta_w: 1.0
+dna_contrast_meta_weight: 0.1
+rna_contrast_meta_weight: 0.1
+
+visualization:
+  save_self_attn: false
+
+wandb:
+  enabled: true
+  project: oncoformer
+  entity: null
+  name: null
+  log_model: false
+  tags: ["omics"]

@@ -1,0 +1,6 @@
+discrete:
+    disease_group: { meta_weight: 1.0, ignore_patterns:['other', 'nos'] }
+    disease_histology: { meta_weight: 0.1, ignore_patterns:['other', 'nos'] }
+    disease_term: { meta_weight: 0.3, ignore_patterns:['other', 'nos'] }
+
+data_path: ./datasets/metadata.pt

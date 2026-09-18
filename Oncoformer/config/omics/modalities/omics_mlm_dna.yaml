@@ -1,0 +1,3 @@
+defaults:
+    - dna: omics_mlm_unpaired
+    - rna: empty
