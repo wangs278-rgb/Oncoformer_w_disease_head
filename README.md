@@ -38,6 +38,67 @@ backbone checkpoint (`run6_moco_out/checkpoints/last.ckpt`, `load_state_dict(str
 
 ---
 
+## Model architecture
+
+```
+                 mutation tokens (per-variant, max 128 per sample)
+                          │
+   ┌──────────────────────┴───────────────────────┐
+   │  component encoders  (concat/​sum → 512-d)     │   gene, alt_type, pathogenicity,
+   │                                               │   zygosity, aa_ref, aa_mut,
+   │                                               │   protein & mutation (ESM, frozen),
+   │                                               │   aa_vaf (Fourier) + aa_vaf_bin
+   └──────────────────────┬───────────────────────┘
+                          │
+             ┌────────────┴────────────┐
+             │  PRETRAINING BACKBONE    │   OncoformerOmics
+             │  4-layer Transformer     │   embed_dim=512, 8 heads, max_len=128, bf16
+             │  encoder (per modality;  │
+             │  DNA-only here)          │
+             └────────────┬────────────┘
+                          │ pooled / per-token hidden states
+        ┌─────────────────┼──────────────────────────────┬─────────────────────┐
+        ▼                 ▼                                ▼                     ▼
+  MLM heads          MLM head: gene              MoCo/CLIP head          Disease head
+  (per field)        (masked-token              (contrastive,           (SUPERVISED, run8)
+  alt_type,           reconstruction)            student+teacher,        disease_term
+  pathogenicity,     ← "the gene head"           queue 65536,            Classification
+  zygosity,                                       out 256, τ=0.07)        511 classes
+  aa_ref, aa_mut,                                                         weight 0.3
+  aa_vaf_bin
+  └────────────── self-supervised (from run6 backbone) ──────────────┘   └─ added on top ─┘
+```
+
+**Pretraining backbone — `OncoformerOmics`** (trained in run6, warm-started into run8):
+- Per-modality Transformer encoder (DNA-only in this line of work): **4 layers, `embed_dim=512`,
+  8 attention heads, `max_length=128`** variants/sample, bf16-mixed.
+- Each variant is embedded from multiple **components** and combined (concat/sum → 512-d):
+  `gene`, `alt_type`, `pathogenicity`, `zygosity`, `aa_ref`, `aa_mut`, `protein` &
+  `mutation` (precomputed **ESM** embeddings, frozen), and `aa_vaf` (Fourier encoder) +
+  `aa_vaf_bin`.
+- **Self-supervised objectives:**
+  1. **MLM** — a reconstruction head per masked field: `gene`, `alt_type`, `pathogenicity`,
+     `zygosity`, `aa_ref`, `aa_mut`, `aa_vaf_bin` (`protein` is aliased to the gene target;
+     `mutation` to `[alt_type, aa_ref, aa_mut, pathogenicity]`). **The "gene head" is one of
+     these.**
+  2. **MoCo / CLIP contrastive** — student/teacher projection heads (`CLIPMoCoHead`),
+     `clip_out_dim=256`, `clip_hidden=2048`, momentum queue `65536`, temperature `0.07`
+     (single-modality MoCo fallback since it's DNA-only).
+
+**Supervised head — added by `OncoformerPost` in run8:**
+- **Disease head** — `prediction_heads['disease_term']`, a `Classification` over **511
+  DiseaseTerm classes** on the backbone's pooled embedding (CE, `ignore_index=-100`, label
+  smoothing 0.1), auxiliary weight **0.3**.
+
+**Total training loss (run8, `pre_train_model=True`):**
+```
+loss = MLM_loss (all reconstruction heads incl. gene)
+     + MoCo_contrastive_loss
+     + 0.3 · disease_term_CE
+```
+
+---
+
 ## Repository layout
 
 ```
