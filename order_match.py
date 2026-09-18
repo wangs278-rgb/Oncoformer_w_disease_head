@@ -86,7 +86,7 @@ for bi, batch in enumerate(loader):
     md = batch['sample_metadata']['sample_metadata']
     dx = md['BaitSet'].astype(str).isin(['DX1', 'DX2']).values
     sids = md.index.astype(str).tolist()
-    gf = dna['gene'].numpy(); mk = mask.numpy(); vf = dna['aa_vaf_bin'].numpy()
+    gf = dna['gene'].numpy(); mk = mask.numpy(); vf = dna['aa_vaf'].numpy()   # CONTINUOUS VAF
     for r in np.where(dx)[0]:
         t = sid2true.get(sids[r])
         if t not in tgt_set:
@@ -94,17 +94,17 @@ for bi, batch in enumerate(loader):
         ranks = gene_rank[t]
         if len(ranks) < 2:
             continue
-        # gene -> highest VAF level carried in this tumour (only recipe genes with a real VAF)
+        # gene -> highest continuous VAF carried in this tumour (recipe genes with a real VAF>0)
         gv = {}
         valid = (gf[r] >= REAL_MIN) & (mk[r] > 0)
         for s in np.where(valid)[0]:
             g = int(gf[r, s])
             if g not in ranks:
                 continue
-            lvl = VAF_IDS.get(int(vf[r, s]))
-            if lvl is None:
+            val = float(vf[r, s])
+            if not (val > 0):
                 continue
-            gv[g] = max(gv.get(g, 0), lvl)
+            gv[g] = max(gv.get(g, 0.0), val)
         if len(gv) < 2:
             continue
         n_tum += 1

@@ -47,7 +47,6 @@ backbone checkpoint (`run6_moco_out/checkpoints/last.ckpt`, `load_state_dict(str
 ├── build_disease_metadata_run8.py  # builds disease targets + vocab (one-time preprocessing)
 ├── dryrun_run8_disease.py          # fast config/data smoke test
 ├── eval_run8_disease_head.py       # supervised DiseaseTerm eval on DX1/DX2 val split
-├── submit_run8_disease.sh          # SLURM launcher (4× B200, preempt+requeue)
 ├── vocab_dna.json                  # DNA tokenizer vocab (small, kept in repo)
 ├── vocab_metadata_disease_run8.json# disease-term vocab (small, kept in repo)
 │
@@ -56,7 +55,6 @@ backbone checkpoint (`run6_moco_out/checkpoints/last.ckpt`, `load_state_dict(str
 ├── insilico_*.py                   # in-silico perturbation (KO, KI, dose, evo, shift, minsig)
 ├── eval_*.py                       # evaluation (VUS, gene-stratified, head competence, …)
 ├── plot_*.py                       # figures (umap, cup, dose, grammar, ki/ko, shift, …)
-├── submit_*.sh                     # SLURM launchers for each stage
 │
 ├── Oncoformer/                     # vendored backbone package (MLM baseline)
 └── Oncoformer_moco/                # vendored package with the disease-head model code
@@ -108,23 +106,27 @@ python build_disease_metadata_run8.py
 #   -> metadata_disease_run8.pt (511 classes), vocab_metadata_disease_run8.json
 
 # 2. (If missing) build the DX1/DX2 MoCo tokenized cache
-sbatch submit_pretok_run6.sh          # -> tokenized_dna_dx12_moco.pt
+python pretokenize_run6.py            # -> tokenized_dna_dx12_moco.pt
 
 # 3. Sanity-check config + data wiring
 python dryrun_run8_disease.py
 
-# 4. Train (4× B200, warm-starts from run6 last.ckpt; auto-requeues on preemption)
-sbatch submit_run8_disease.sh         # -> run8_disease_out/checkpoints/
+# 4. Train (multi-GPU, warm-starts from run6 last.ckpt; auto-requeues on preemption)
+python train_run8_disease.py          # -> run8_disease_out/checkpoints/
 
 # 5. Evaluate the disease head on the DX1/DX2 non-degenerate val split
-sbatch submit_eval_run8_disease_head.sh
+python eval_run8_disease_head.py
 #   -> run8_disease_out/eval/run8_disease_head_eval.json
 #      (acc@1/@5, macro/weighted F1, OvR AUROC/AUPRC vs. majority baseline)
 ```
 
+> The SLURM launcher scripts (`submit_*.sh`) are cluster-specific and are **not** part of
+> this repo; run the `python` entrypoints above directly, or wrap them in your own scheduler
+> job. `train_run8_disease.py` picks up `torch.cuda.device_count()` GPUs via DDP.
+
 Downstream analysis (feature extraction, in-silico KO/KI/dose/evo/shift, plotting) uses the
-matching `extract_*.py` / `insilico_*.py` / `plot_*.py` scripts and their `submit_*.sh`
-launchers, all reading from `run8_disease_out/`.
+matching `extract_*.py` / `insilico_*.py` / `plot_*.py` scripts, all reading from
+`run8_disease_out/`.
 
 ---
 

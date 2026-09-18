@@ -32,7 +32,8 @@ external_annotations/
 # --- Training / analysis output directories ---
 run*_out/
 
-# --- SLURM logs & job-id state ---
+# --- SLURM launchers, logs & job-id state (cluster-specific; kept out of the repo) ---
+/submit*.sh
 *.out
 *.err
 *.jobids

@@ -55,8 +55,11 @@ print(f'genes vocab={NG}  top lineages={nTL}', flush=True)
 dl = OncoformerDataLoader(config, load_metadata=True)
 loader = DataLoader(dl.dataset, batch_size=CHUNK, shuffle=False, collate_fn=dl.collate_fn)
 
-hist_overall = np.zeros((NG, 10), dtype=np.int64)          # gene -> VAF-level histogram
-hist_bylin = np.zeros((NG, nTL, 10), dtype=np.int64)       # gene x lineage -> VAF histogram
+NBINS = 20                                                 # continuous VAF binned over [0,1]
+CLONAL_BIN = int(0.8 * NBINS)                              # VAF >= 0.8 counts as high-clonality
+CENTERS = (np.arange(NBINS) + 0.5) / NBINS
+hist_overall = np.zeros((NG, NBINS), dtype=np.int64)       # gene -> continuous-VAF histogram
+hist_bylin = np.zeros((NG, nTL, NBINS), dtype=np.int64)    # gene x lineage -> VAF histogram
 carrier = np.zeros(NG, dtype=np.int64)
 n_tumours = 0
 for bi, batch in enumerate(loader):
@@ -64,7 +67,7 @@ for bi, batch in enumerate(loader):
     md = batch['sample_metadata']['sample_metadata']
     dx = md['BaitSet'].astype(str).isin(['DX1', 'DX2']).values
     sids = md.index.astype(str).tolist()
-    gf = dna['gene'].numpy(); mk = mask.numpy(); vf = dna['aa_vaf_bin'].numpy()
+    gf = dna['gene'].numpy(); mk = mask.numpy(); vf = dna['aa_vaf'].numpy()   # CONTINUOUS VAF
     for r in np.where(dx)[0]:
         valid = (gf[r] >= REAL_MIN) & (mk[r] > 0)
         if not valid.any():
@@ -78,12 +81,13 @@ for bi, batch in enumerate(loader):
                 continue
             if g not in seen:
                 carrier[g] += 1; seen.add(g)
-            lvl = VAF_IDS.get(int(vf[r, s]))
-            if lvl is None:
+            val = float(vf[r, s])
+            if not (val > 0):                              # skip CN/missing (no VAF)
                 continue
-            hist_overall[g, lvl - 1] += 1
+            b = min(NBINS - 1, int(val * NBINS))
+            hist_overall[g, b] += 1
             if li >= 0:
-                hist_bylin[g, li, lvl - 1] += 1
+                hist_bylin[g, li, b] += 1
     if args.scan_batches and bi + 1 >= args.scan_batches:
         break
     if (bi + 1) % 200 == 0:
@@ -96,21 +100,20 @@ print(f'genes with >= {args.min_carriers} carriers: {len(sel)}  (tumours scanned
 
 
 def summ(h):
-    """weighted median + mean VAF level (1..10) from a [10] histogram; nan if empty."""
+    """weighted median + mean continuous VAF (0..1) from a [NBINS] histogram; nan if empty."""
     tot = h.sum()
     if tot == 0:
         return np.nan, np.nan
-    lv = np.arange(1, 11)
-    mean = float((h * lv).sum() / tot)
+    mean = float((h * CENTERS).sum() / tot)
     cdf = np.cumsum(h) / tot
-    med = float(lv[np.searchsorted(cdf, 0.5)])
+    med = float(CENTERS[np.searchsorted(cdf, 0.5)])
     return med, mean
 
 
 med_overall = np.array([summ(hist_overall[g])[0] for g in sel])
 mean_overall = np.array([summ(hist_overall[g])[1] for g in sel])
-# clonal fraction = fraction of a gene's mutations at VAF level >= 8 (high clonality)
-clonal_frac = np.array([hist_overall[g, 7:].sum() / max(1, hist_overall[g].sum()) for g in sel])
+# clonal fraction = fraction of a gene's mutations at VAF >= 0.8 (high clonality)
+clonal_frac = np.array([hist_overall[g, CLONAL_BIN:].sum() / max(1, hist_overall[g].sum()) for g in sel])
 med_bylin = np.array([[summ(hist_bylin[g, li])[0] for li in range(nTL)] for g in sel])
 
 np.savez_compressed(
@@ -124,6 +127,6 @@ np.savez_compressed(
 for gname in ['KRAS', 'TP53', 'APC', 'BRAF', 'EGFR', 'PIK3CA', 'NKX2-1', 'AR', 'VHL', 'PTEN']:
     if gname in names:
         k = names.index(gname)
-        print(f'  {gname:7s} carriers={carrier[sel][k]:6d} medVAF={med_overall[k]:.0f} '
+        print(f'  {gname:7s} carriers={carrier[sel][k]:6d} medVAF={med_overall[k]:.2f} '
               f'meanVAF={mean_overall[k]:.2f} clonalFrac={clonal_frac[k]:.2f}', flush=True)
 print(f'\nDONE -> {EV_DIR}/clonality_results.npz', flush=True)

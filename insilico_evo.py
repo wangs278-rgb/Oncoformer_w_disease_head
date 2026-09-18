@@ -144,7 +144,7 @@ for bi, batch in enumerate(loader):
     md = batch['sample_metadata']['sample_metadata']
     dx = md['BaitSet'].astype(str).isin(['DX1', 'DX2']).values
     sids = md.index.astype(str).tolist()
-    gf = dna['gene'].numpy(); mk = mask.numpy(); vf = dna['aa_vaf_bin'].numpy()
+    gf = dna['gene'].numpy(); mk = mask.numpy(); vf = dna['aa_vaf'].numpy()   # CONTINUOUS VAF
     for r in np.where(dx)[0]:
         tr = sid2true.get(sids[r])
         if tr not in tgt_set or len(pool[tr]) >= N_PER:
@@ -152,10 +152,10 @@ for bi, batch in enumerate(loader):
         real = np.where((gf[r] >= REAL_MIN) & (mk[r] > 0))[0]
         if real.size < args.min_mut:
             continue
-        # VAF key per real slot: human level 1..10 if present, else a random level (unbiased)
-        vkey = np.array([VAF_IDS.get(int(vf[r, s]), 0) for s in real], dtype=float)
-        miss = vkey == 0
-        vkey[miss] = rng.integers(1, 11, size=int(miss.sum()))
+        # VAF key per real slot: continuous aa_vaf in (0,1]; CN/missing (vaf<=0) -> random (unbiased)
+        vkey = vf[r][real].astype(float)
+        miss = ~(vkey > 0)
+        vkey[miss] = rng.random(int(miss.sum()))
         rec = {c: dna[c][r].clone().numpy() for c in COMP_KEYS}
         rec['__mask__'] = mk[r].copy(); rec['__real__'] = real; rec['__vkey__'] = vkey
         rec['__nmiss__'] = int(miss.sum())
