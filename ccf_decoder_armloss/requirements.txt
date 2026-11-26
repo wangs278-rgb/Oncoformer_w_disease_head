@@ -1,0 +1,6 @@
+# versions of the environment the model was trained and audited in (Python 3.10)
+torch==2.7.1
+numpy==2.2.6
+scipy==1.15.3
+pandas==2.3.2
+pyarrow==21.0.0

@@ -1,0 +1,9 @@
+# code only: data, checkpoints, generated cohorts and logs stay out of git
+data/
+checkpoints/
+gen/
+logs/
+*.npz
+*.pt
+*.json
+__pycache__/
